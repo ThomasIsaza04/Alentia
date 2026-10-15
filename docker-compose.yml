@@ -1,0 +1,35 @@
+# Levantar todo en local: docker compose up --build (RNF16)
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: alentia
+      POSTGRES_USER: alentia
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cambiar_en_env}
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD:-cambiar_en_env}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U alentia -d alentia"]
+      interval: 5s
+      retries: 10
+
+  api:
+    build: ./backend
+    env_file: ./backend/.env
+    environment:
+      # La aplicación usa el rol restringido; las migraciones usan el dueño del esquema.
+      DATABASE_URL: postgresql+psycopg://alentia_app:${APP_DB_PASSWORD:-cambiar_en_env}@db:5432/alentia
+      MIGRATION_DATABASE_URL: postgresql+psycopg://alentia:${POSTGRES_PASSWORD:-cambiar_en_env}@db:5432/alentia
+    command: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+
+volumes:
+  pgdata:
