@@ -1,0 +1,32 @@
+# Blueprint de Render para el backend de Alentia (prototipo).
+# La base de datos vive en Supabase; Render solo ejecuta la API.
+# Los valores marcados con sync: false se escriben a mano en el panel de Render; nunca van en este archivo.
+services:
+  - type: web
+    name: alentia-api
+    runtime: docker
+    region: virginia
+    plan: free
+    dockerContext: ./backend
+    dockerfilePath: ./backend/Dockerfile
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: DATABASE_URL
+        sync: false   # cadena del pooler de transacciones de Supabase (puerto 6543), usuario alentia_app
+      - key: FRONTEND_URL
+        sync: false   # https://<tu-proyecto>.vercel.app
+      - key: CORS_ORIGINS
+        sync: false   # mismo origen de Vercel; con el rewrite no hace falta más de uno
+      - key: ENCRYPTION_ACTIVE_KEY_ID
+        value: k1
+      - key: ENCRYPTION_KEYS
+        sync: false   # k1:<clave base64 de 32 bytes nueva>
+      - key: JWT_SECRET
+        sync: false   # cadena aleatoria nueva, mínimo 32 caracteres
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: COOKIE_SAMESITE
+        value: lax
