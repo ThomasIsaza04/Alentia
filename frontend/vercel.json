@@ -7,8 +7,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://REEMPLAZAR-alentia-api.onrender.com/api/:path*"
-    },
+   "destination": "https://alentia-api.onrender.com/api/:path*"},
     {
       "source": "/(.*)",
       "destination": "/index.html"
