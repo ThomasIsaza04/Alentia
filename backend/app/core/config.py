@@ -39,5 +39,12 @@ class Settings(BaseSettings):
     cookie_secure: bool = True
     cookie_samesite: Literal["lax", "strict", "none"] = "lax"
 
+    # Correo transaccional en producción (Brevo SMTP). Las credenciales van solo en el entorno.
+    smtp_host: str = "smtp-relay.brevo.com"
+    smtp_port: int = 587
+    smtp_usuario: str | None = None
+    smtp_clave: str | None = None
+    correo_remitente: str | None = None
+
 
 settings = Settings()
